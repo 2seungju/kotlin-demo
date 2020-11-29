@@ -1,5 +1,7 @@
 package com.example.kotlindemo.service
 
+import com.example.kotlindemo.model.OAuthToken
+import com.example.kotlindemo.utils.OAuthUtil
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Service
 import java.math.BigInteger
@@ -18,14 +20,29 @@ class NaverLoginServiceImpl: NaverLoginService {
 
         request.session.setAttribute("state", state);
 
-        val encodedCallback: String = java.net.URLEncoder.encode(callback, "utf-8");
+        val oAuthUtil: OAuthUtil = OAuthUtil.Builder()
+                .clientId(clientId)
+                .callback(callback)
+                .state(state)
+                .build();
 
-        return "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=$clientId&redirect_uri=$encodedCallback&state=$state";
+        return oAuthUtil.createAuthorizationUri();
     }
 
     private fun generateState(): String {
         val secureRandom = SecureRandom();
 
         return BigInteger(130, secureRandom).toString(32);
+    }
+
+    override fun fetchToken(authCode: String): OAuthToken {
+        val oAuthUtil: OAuthUtil = OAuthUtil.Builder()
+                .clientId(clientId)
+                .secretKey(secretKey)
+                .callback(callback)
+                .code(authCode)
+                .build();
+
+        return oAuthUtil.fetchOAuthToken();
     }
 }
