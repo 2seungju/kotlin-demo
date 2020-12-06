@@ -30,6 +30,6 @@ class MainController(private val naverLoginService: NaverLoginService) {
             return ResponseEntity("Token is invalid." , HttpStatus.BAD_REQUEST);
         }
 
-        return ResponseEntity("Token is valid." , HttpStatus.OK)
+        return ResponseEntity(naverLoginService.fetchToken(code) , HttpStatus.OK)
     }
 }
