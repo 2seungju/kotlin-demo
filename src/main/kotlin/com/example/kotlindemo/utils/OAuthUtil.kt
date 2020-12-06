@@ -29,25 +29,29 @@ class OAuthUtil private constructor(
     fun fetchOAuthToken(): OAuthToken {
         val apiUri = "${NaverOAuthDomain.ACCESS_TOKEN.domain}&client_id=$clientId&client_secret=$secretKey&code=$code"
 
-        val responseEntity: ResponseEntity<String> = restTemplate.exchange(apiUri, HttpMethod.GET, null, String::class.java);
+        val responseEntity: ResponseEntity<String> = requestGetApi(apiUri);
 
-        return objectMapper.readValue(responseEntity.body?: "");
+        return objectMapper.readValue(responseEntity.body?: "fail");
     }
 
     fun refreshOAuthToken(refreshToken: String): OAuthToken {
         val apiUri = "${NaverOAuthDomain.REFRESH_TOKEN.domain}&client_id=$clientId&client_secret=$secretKey&refresh_token=$refreshToken"
 
-        val responseEntity: ResponseEntity<String> = restTemplate.exchange(apiUri, HttpMethod.GET, null, String::class.java);
+        val responseEntity: ResponseEntity<String> = requestGetApi(apiUri);
 
-        return objectMapper.readValue(responseEntity.body?: "");
+        return objectMapper.readValue(responseEntity.body?: "fail");
     }
 
     fun deleteOAuthToken(accessToken: String): OAuthToken {
         val apiUri = "${NaverOAuthDomain.DELETE_TOKEN.domain}&client_id=$clientId&client_secret=$secretKey&access_token=$accessToken"
 
-        val responseEntity: ResponseEntity<String> = restTemplate.exchange(apiUri, HttpMethod.GET, null, String::class.java);
+        val responseEntity: ResponseEntity<String> = requestGetApi(apiUri);
 
-        return objectMapper.readValue(responseEntity.body?: "");
+        return objectMapper.readValue(responseEntity.body?: "fail");
+    }
+
+    private fun requestGetApi(apiUri: String): ResponseEntity<String> {
+        return restTemplate.exchange(apiUri, HttpMethod.GET, null, String::class.java);
     }
 
     class Builder {
